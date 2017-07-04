@@ -1,0 +1,43 @@
+<?php
+function mail_attachement($to , $sujet , $message , $fichier , $typemime , $nom , $reply , $from){
+
+$to="balamini92@gmail.com";
+$sujet="réservation";
+$message = "Message reçu avec pieces j";
+$fichier = "pj.pdf";
+$typemime = "application/pdf";
+$nom = $_POST['nom'];
+$reply = "...";
+$from = "bala_92i@homtail.fr";
+ $limite = "_parties_".md5(uniqid (rand())); 
+  
+  $mail_mime = "Date: ".date("l j F Y, G:i")."\n"; 
+  $mail_mime .= "MIME-Version: 1.0\n"; 
+  $mail_mime .= "Content-Type: multipart/mixed;\n"; 
+  $mail_mime .= " boundary=\"----=$limite\"\n\n"; 
+  
+  //Le message en texte simple pour les navigateurs qui n'acceptent pas le HTML 
+  $texte = "This is a multi-part message in MIME format.\n"; 
+  $texte .= "Ceci est un message est au format MIME.\n"; 
+  $texte .= "------=$limite\n"; 
+  $texte .= "Content-Type: text/plain; charset=\"iso-8859-1\"\n"; 
+  $texte .= "Content-Transfer-Encoding: 7bit\n\n"; 
+  $texte .= $message; 
+  $texte .= "\n\n"; 
+  
+  //le fichier 
+  $attachement = "------=$limite\n"; 
+  $attachement .= "Content-Type: $typemime; name=\"$nom\"\n"; 
+  $attachement .= "Content-Transfer-Encoding: base64\n"; 
+  $attachement .= "Content-Disposition: attachment; filename=\"$nom\"\n\n"; 
+  
+  $fd = fopen( $fichier, "r" ); 
+  $contenu = fread( $fd, filesize( $fichier ) ); 
+  fclose( $fd ); 
+  $attachement .= chunk_split(base64_encode($contenu)); 
+  
+  $attachement .= "\n\n\n------=$limite\n"; 
+  return mail($to, $sujet, $texte.$attachement, "Reply-to: $reply\nFrom:
+$from\n".$mail_mime); 
+}
+?>
